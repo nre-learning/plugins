@@ -218,6 +218,7 @@ type Bridge struct {
 	LinkAttrs
 	MulticastSnooping *bool
 	HelloTime         *uint32
+	GroupFwdMask      *uint16
 }
 
 func (bridge *Bridge) Attrs() *LinkAttrs {

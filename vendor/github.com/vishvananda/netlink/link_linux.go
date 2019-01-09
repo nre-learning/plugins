@@ -111,6 +111,20 @@ func (h *Handle) SetPromiscOn(link Link) error {
 	return err
 }
 
+// LinkSetHardwareAddr sets the hardware address of the link device.
+// Equivalent to: `ip link set $link address $hwaddr`
+func BridgeSetGroupFwdMask(link Link, mask uint16) error {
+	return pkgHandle.BridgeSetGroupFwdMask(link, mask)
+}
+
+// LinkSetHardwareAddr sets the hardware address of the link device.
+// Equivalent to: `ip link set $link address $hwaddr`
+func (h *Handle) BridgeSetGroupFwdMask(link Link, mask uint16) error {
+	bridge := link.(*Bridge)
+	bridge.GroupFwdMask = &mask
+	return h.linkModify(bridge, syscall.NLM_F_ACK)
+}
+
 func BridgeSetMcastSnoop(link Link, on bool) error {
 	return pkgHandle.BridgeSetMcastSnoop(link, on)
 }
@@ -1773,6 +1787,11 @@ func addBridgeAttrs(bridge *Bridge, linkInfo *nl.RtAttr) {
 	}
 	if bridge.HelloTime != nil {
 		nl.NewRtAttrChild(data, nl.IFLA_BR_HELLO_TIME, nl.Uint32Attr(*bridge.HelloTime))
+	}
+	mask := uint16(16384)
+	bridge.GroupFwdMask = &mask
+	if bridge.GroupFwdMask != nil {
+		nl.NewRtAttrChild(data, nl.IFLA_BR_GROUP_FWD_MASK, nl.Uint16Attr(*bridge.GroupFwdMask))
 	}
 }
 

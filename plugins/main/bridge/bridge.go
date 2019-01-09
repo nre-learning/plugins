@@ -52,6 +52,7 @@ type NetConf struct {
 	MTU          int    `json:"mtu"`
 	HairpinMode  bool   `json:"hairpinMode"`
 	PromiscMode  bool   `json:"promiscMode"`
+	GroupFwdMask int    `json:"groupFwdMask"`
 }
 
 type gwInfo struct {
@@ -209,7 +210,8 @@ func bridgeByName(name string) (*netlink.Bridge, error) {
 	return br, nil
 }
 
-func ensureBridge(brName string, mtu int, promiscMode bool) (*netlink.Bridge, error) {
+func ensureBridge(brName string, mtu int, promiscMode bool, groupFwdMask int) (*netlink.Bridge, error) {
+	gfm := uint16(groupFwdMask)
 	br := &netlink.Bridge{
 		LinkAttrs: netlink.LinkAttrs{
 			Name: brName,
@@ -220,6 +222,7 @@ func ensureBridge(brName string, mtu int, promiscMode bool) (*netlink.Bridge, er
 			// default packet limit
 			TxQLen: -1,
 		},
+		GroupFwdMask: &gfm,
 	}
 
 	err := netlink.LinkAdd(br)
@@ -294,7 +297,7 @@ func calcGatewayIP(ipn *net.IPNet) net.IP {
 
 func setupBridge(n *NetConf) (*netlink.Bridge, *current.Interface, error) {
 	// create bridge if necessary
-	br, err := ensureBridge(n.BrName, n.MTU, n.PromiscMode)
+	br, err := ensureBridge(n.BrName, n.MTU, n.PromiscMode, n.GroupFwdMask)
 	if err != nil {
 		return nil, nil, fmt.Errorf("failed to create bridge %q: %v", n.BrName, err)
 	}
