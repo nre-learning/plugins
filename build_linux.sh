@@ -20,7 +20,8 @@ export GO="${GO:-go}"
 mkdir -p "${PWD}/bin"
 
 echo "Building plugins ${GOOS}"
-PLUGINS="plugins/meta/* plugins/main/* plugins/ipam/* plugins/sample"
+# PLUGINS="plugins/meta/* plugins/main/* plugins/ipam/* plugins/sample"
+PLUGINS="plugins/main/antibridge"
 for d in $PLUGINS; do
 	if [ -d "$d" ]; then
 		plugin="$(basename "$d")"
@@ -30,3 +31,15 @@ for d in $PLUGINS; do
 		fi
 	fi
 done
+
+# gcloud compute scp --zone=us-west1-a bin/antibridge antidote-worker-6l0v:/tmp
+# gcloud compute scp --zone=us-west1-b bin/antibridge antidote-worker-2nqc:/tmp
+# gcloud compute scp --zone=us-west1-c bin/antibridge antidote-worker-z54h:/tmp
+
+# gcloud compute ssh --zone=us-west1-a antidote-worker-6l0v --command="sudo mv /tmp/antibridge /opt/cni/bin/antibridge"
+# gcloud compute ssh --zone=us-west1-b antidote-worker-2nqc --command="sudo mv /tmp/antibridge /opt/cni/bin/antibridge"
+# gcloud compute ssh --zone=us-west1-c antidote-worker-z54h --command="sudo mv /tmp/antibridge /opt/cni/bin/antibridge"
+
+# gcloud compute ssh --zone=us-west1-a antidote-worker-6l0v --command="sudo systemctl restart kubelet"
+# gcloud compute ssh --zone=us-west1-b antidote-worker-2nqc --command="sudo systemctl restart kubelet"
+# gcloud compute ssh --zone=us-west1-c antidote-worker-z54h --command="sudo systemctl restart kubelet"
